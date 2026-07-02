@@ -43,10 +43,7 @@ HAGSTOFA_CPI_URL = (
     "1_vnv/1_vnv/VIS01000.px"
 )
 CPI_QUERY = {
-    "query": [
-        {"code": "Vísitala", "selection": {"filter": "item", "values": ["CPI"]}},
-        {"code": "Liður", "selection": {"filter": "item", "values": ["index"]}},
-    ],
+    "query": [{"code": "Vísitala", "selection": {"filter": "item", "values": ["CPI"]}}],
     "response": {"format": "json"},
 }
 
@@ -64,7 +61,7 @@ def fetch_cpi(cache: str = "cpi_monthly.csv") -> pd.DataFrame:
     with urllib.request.urlopen(req, timeout=30) as resp:
         raw = json.load(resp)
     rows = [
-        (item["key"][0], float(item["values"][0]))
+        (item["key"][-1], float(item["values"][0]))
         for item in raw["data"] if item["values"][0] not in (".", "..")
     ]
     df = pd.DataFrame(rows, columns=["month", "cpi"])

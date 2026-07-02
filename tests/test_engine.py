@@ -59,3 +59,19 @@ def test_compare_orders_sensibly_low_inflation():
     s = compare(P, RR, NR, Y, Y, annual_inflation=0.025)
     assert (s.loc["verðtryggt + fixed óvt payment"].total_real
             < s.loc["óverðtryggt"].total_real)             # strategy wins at CB target
+
+
+def test_recalc_mode():
+    """Monthly recalculation (bank default) absorbs overpayments: the loan
+    runs full term and costs MORE than under a held schedule."""
+    non = simulate_loan(P, NR, Y, indexed=False, inflation=0.052)
+    pay0 = float(non.schedule.payment_nominal.iloc[0])
+    rc = simulate_loan(P, RR, Y, indexed=True, inflation=0.052,
+                       recalc_schedule=True, target_total_payment=pay0)
+    fs = simulate_loan(P, RR, Y, indexed=True, inflation=0.052,
+                       target_total_payment=pay0)
+    assert rc.months_to_payoff == Y * 12          # stretched back to full term
+    assert fs.months_to_payoff < rc.months_to_payoff
+    assert rc.total_paid_real > fs.total_paid_real  # recalc mode costs more
+    # required payment still overtakes the fixed commitment eventually
+    assert rc.schedule.payment_nominal.max() > pay0 * 1.1

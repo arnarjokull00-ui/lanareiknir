@@ -109,10 +109,18 @@ def simulate_loan(
     inflation: Union[float, Sequence[float]] = 0.0,
     rate_path: Optional[Sequence[float]] = None,   # monthly annual-rate values (variable óverðtryggt)
     target_total_payment: Optional[Union[float, Callable[[int], float]]] = None,
+    recalc_schedule: bool = False,
     index_lag_months: int = 0,
     max_months: Optional[int] = None,
 ) -> LoanResult:
     """Simulate one loan month by month.
+
+    recalc_schedule — Icelandic bank default (lækka greiðslubyrði applied
+    continuously): the scheduled payment is re-derived every month from the
+    CURRENT balance over the REMAINING original term, so overpayments lower
+    subsequent required payments rather than shortening the schedule. With
+    False (stytta lánstíma), the original schedule is held and overpayments
+    shorten the term.
 
     target_total_payment — a fixed nominal amount (or fn of month t) the
     borrower commits to paying in total each month. Anything above the
@@ -147,9 +155,12 @@ def simulate_loan(
             f = index_at(t)
             interest = bal * monthly_rate                       # real
             if payment_type == "annuity":
-                sched_real = min(sched_annuity, bal + interest)
+                sched = (annuity_payment(bal, monthly_rate, max(n - t, 1))
+                         if recalc_schedule else sched_annuity)
+                sched_real = min(sched, bal + interest)
             else:
-                sched_real = min(installment + interest, bal + interest)
+                inst = bal / max(n - t, 1) if recalc_schedule else installment
+                sched_real = min(inst + interest, bal + interest)
             sched_nom = sched_real * f
             total_nom = sched_nom
             if target_total_payment is not None:
@@ -177,9 +188,12 @@ def simulate_loan(
             mr = cur_rate / MONTHS
             interest = bal * mr
             if payment_type == "annuity":
-                sched_nom = min(sched, bal + interest)
+                s = (annuity_payment(bal, mr, max(n - t, 1))
+                     if recalc_schedule else sched)
+                sched_nom = min(s, bal + interest)
             else:
-                sched_nom = min(installment + interest, bal + interest)
+                inst = bal / max(n - t, 1) if recalc_schedule else installment
+                sched_nom = min(inst + interest, bal + interest)
             total_nom = sched_nom
             if target_total_payment is not None:
                 tgt = target_total_payment(t) if callable(target_total_payment) else target_total_payment
@@ -213,22 +227,23 @@ def compare(
     *,
     annual_inflation: float,
     payment_type: str = "annuity",
+    recalc_schedule: bool = False,
     index_lag_months: int = 0,
 ) -> pd.DataFrame:
     """The four canonical cases, summarised in real krónur."""
     non = simulate_loan(principal, nominal_rate, years_nonindexed, indexed=False,
-                        payment_type=payment_type, inflation=annual_inflation)
+                        payment_type=payment_type, recalc_schedule=recalc_schedule, inflation=annual_inflation)
     vt_passive = simulate_loan(principal, real_rate, years_indexed, indexed=True,
-                               payment_type=payment_type, inflation=annual_inflation,
+                               payment_type=payment_type, recalc_schedule=recalc_schedule, inflation=annual_inflation,
                                index_lag_months=index_lag_months)
     first_non_payment = float(non.schedule.payment_nominal.iloc[0])
     vt_fixed = simulate_loan(principal, real_rate, years_indexed, indexed=True,
-                             payment_type=payment_type, inflation=annual_inflation,
+                             payment_type=payment_type, recalc_schedule=recalc_schedule, inflation=annual_inflation,
                              target_total_payment=first_non_payment,
                              index_lag_months=index_lag_months)
     g = (1.0 + annual_inflation) ** (1.0 / MONTHS)
     vt_grown = simulate_loan(principal, real_rate, years_indexed, indexed=True,
-                             payment_type=payment_type, inflation=annual_inflation,
+                             payment_type=payment_type, recalc_schedule=recalc_schedule, inflation=annual_inflation,
                              target_total_payment=lambda t: first_non_payment * g ** t,
                              index_lag_months=index_lag_months)
     out = pd.DataFrame(
@@ -248,6 +263,7 @@ def match_payment(
     annual_inflation: float,
     horizon_months: int = 120,
     payment_type: str = "annuity",
+    recalc_schedule: bool = False,
 ) -> dict:
     """Extra monthly payment on the indexed loan needed to match the
     óverðtryggt loan's real equity-building pace at a chosen horizon.
@@ -257,20 +273,20 @@ def match_payment(
     loan's real balance at the same point.
     """
     non = simulate_loan(principal, nominal_rate, years, indexed=False,
-                        payment_type=payment_type, inflation=annual_inflation)
+                        payment_type=payment_type, recalc_schedule=recalc_schedule, inflation=annual_inflation)
     h = min(horizon_months, non.months_to_payoff - 1)
     target_bal = float(non.schedule.balance_real.iloc[h])
 
     def real_bal_at(total_payment: float) -> float:
         r = simulate_loan(principal, real_rate, years, indexed=True,
-                          payment_type=payment_type, inflation=annual_inflation,
+                          payment_type=payment_type, recalc_schedule=recalc_schedule, inflation=annual_inflation,
                           target_total_payment=total_payment)
         if h >= r.months_to_payoff:
             return 0.0
         return float(r.schedule.balance_real.iloc[h])
 
     base = simulate_loan(principal, real_rate, years, indexed=True,
-                         payment_type=payment_type, inflation=annual_inflation)
+                         payment_type=payment_type, recalc_schedule=recalc_schedule, inflation=annual_inflation)
     lo = float(base.schedule.payment_nominal.iloc[0])
     hi = lo * 4
     while real_bal_at(hi) > target_bal:
@@ -299,6 +315,7 @@ def breakeven_inflation(
     *,
     strategy: str = "fixed",           # 'fixed' | 'grown'
     payment_type: str = "annuity",
+    recalc_schedule: bool = False,
     lo: float = 0.0,
     hi: float = 0.15,
 ) -> float:
@@ -306,7 +323,8 @@ def breakeven_inflation(
     equals the óverðtryggt loan's real cost. Above it, óverðtryggt wins."""
     def diff(infl: float) -> float:
         s = compare(principal, real_rate, nominal_rate, years, years,
-                    annual_inflation=infl, payment_type=payment_type)
+                    annual_inflation=infl, payment_type=payment_type,
+                    recalc_schedule=recalc_schedule)
         row = ("verðtryggt + fixed óvt payment" if strategy == "fixed"
                else "verðtryggt + óvt payment grown @infl")
         return s.loc[row].total_real - s.loc["óverðtryggt"].total_real

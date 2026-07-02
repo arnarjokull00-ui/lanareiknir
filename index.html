@@ -34,7 +34,7 @@ section{margin-bottom:40px}
 .verdict{font-family:"Bricolage Grotesque",serif;font-weight:500;font-size:clamp(19px,2.4vw,24px);line-height:1.35;padding:18px 20px;background:#fff;border-left:4px solid var(--vt);border-radius:0 10px 10px 0}
 .verdict.lose{border-left-color:var(--ovt)}
 /* signature: breakeven strip */
-.strip{position:relative;height:96px;margin-top:8px}
+.strip{position:relative;height:118px;margin-top:8px}
 .strip svg{width:100%;height:100%;overflow:visible}
 table{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--line);border-radius:10px;overflow:hidden}
 th,td{padding:10px 14px;text-align:right;font-size:14px;border-bottom:1px solid var(--soft)}
@@ -45,6 +45,21 @@ td:first-child{font-family:"Instrument Sans",sans-serif;font-weight:500}
 tr:last-child td{border-bottom:0}
 .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:7px;vertical-align:1px}
 canvas{width:100%;background:#fff;border:1px solid var(--line);border-radius:10px}
+.toggle{margin-bottom:10px}
+.toggle button{font:600 13px "Instrument Sans",sans-serif;padding:6px 14px;border:1px solid var(--line);background:#fff;color:var(--muted);cursor:pointer}
+.toggle button:first-child{border-radius:6px 0 0 6px}
+.toggle button:last-child{border-radius:0 6px 6px 0;border-left:0}
+.toggle button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.toggle button:focus-visible{outline:2px solid var(--vt);outline-offset:1px}
+.chartnote{font-size:13px;color:var(--muted);margin-top:8px;max-width:64ch}
+.derived{background:var(--soft);border-radius:8px;padding:12px 14px;margin:14px 0 4px;font-size:13px;line-height:1.7}
+.derived b{font-family:"Spline Sans Mono",monospace;color:var(--ink)}
+.derived em{font-style:normal;color:var(--ovt);font-family:"Spline Sans Mono",monospace;font-size:12px}
+.derived .ltv{display:block;margin-bottom:6px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-size:11px}
+.adv{margin:12px 0}
+.adv summary{cursor:pointer;font-size:13px;font-weight:600;color:var(--vt);padding:4px 0}
+.adv summary:focus-visible{outline:2px solid var(--vt);outline-offset:2px}
+.adv[open] summary{margin-bottom:6px}
 .match{background:#fff;border:1px solid var(--line);border-radius:10px;padding:18px 20px}
 .match strong{font-family:"Spline Sans Mono",monospace;font-size:20px;color:var(--vt)}
 footer{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);font-size:13px;color:var(--muted);max-width:70ch}
@@ -60,18 +75,31 @@ footer{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);font-si
 <main>
   <div class="panel">
     <h2>Forsendur</h2>
-    <label for="principal">Höfuðstóll (kr.)</label>
+    <label for="principal">Lánsfjárhæð (kr.)</label>
     <input type="number" id="principal" value="43000000" step="1000000" min="1000000">
-    <label for="rr">Verðtryggðir vextir <span class="sub">(raunvextir, %)</span></label>
-    <input type="number" id="rr" value="4.0" step="0.05" min="0" max="15">
-    <label for="nr">Óverðtryggðir vextir <span class="sub">(nafnvextir, %)</span></label>
-    <input type="number" id="nr" value="9.0" step="0.05" min="0" max="20">
+    <label for="propval">Fasteignaverð (kr.) <span class="sub">— ræður veðhlutfalli og vaxtaálagi</span></label>
+    <input type="number" id="propval" value="60000000" step="1000000" min="1000000">
+    <label for="policy">Stýrivextir Seðlabankans (%)</label>
+    <input type="number" id="policy" value="7.5" step="0.25" min="0" max="15">
+    <div class="derived" id="derived"></div>
+    <details class="adv">
+      <summary>Fínstilla vexti handvirkt</summary>
+      <label for="rr">Verðtryggðir raunvextir (%) <span class="sub">— skildu eftir autt fyrir sjálfvirkt</span></label>
+      <input type="number" id="rr" step="0.05" min="0" max="15" placeholder="sjálfvirkt">
+      <label for="nr">Óverðtryggðir nafnvextir (%) <span class="sub">— skildu eftir autt fyrir sjálfvirkt</span></label>
+      <input type="number" id="nr" step="0.05" min="0" max="20" placeholder="sjálfvirkt">
+    </details>
     <label for="years">Lánstími (ár)</label>
     <input type="number" id="years" value="30" step="5" min="5" max="40">
     <label for="ptype">Greiðslufyrirkomulag</label>
     <select id="ptype">
       <option value="annuity">Jafnar greiðslur (annuitet)</option>
       <option value="equal_principal">Jafnar afborganir</option>
+    </select>
+    <label for="omode">Áhrif aukaafborgunar</label>
+    <select id="omode">
+      <option value="recalc">Greiðsla endurreiknuð mánaðarlega (venja banka)</option>
+      <option value="shorten">Styttir lánstíma (föst greiðsluáætlun)</option>
     </select>
     <label for="infl">Verðbólga að meðaltali: <span class="rangeval" id="inflv">5,0%</span></label>
     <input type="range" id="infl" min="0" max="12" step="0.1" value="5.0" aria-label="Verðbólguforsenda í prósentum">
@@ -91,6 +119,14 @@ footer{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);font-si
       <canvas id="chart" height="360" role="img" aria-label="Línurit sem sýnir raunvirði eftirstöðva þriggja lánaleiða yfir lánstímann"></canvas>
     </section>
     <section>
+      <h2>Greiðslubyrði á mánuði</h2>
+      <div class="toggle" role="group" aria-label="Veldu nafnvirði eða raunvirði">
+        <button id="tgNom" class="on" type="button">Nafnkrónur</button><button id="tgReal" type="button">Raunkrónur</button>
+      </div>
+      <canvas id="paychart" height="300" role="img" aria-label="Línurit sem sýnir mánaðarlega greiðslubyrði lánaleiðanna yfir tíma"></canvas>
+      <p class="chartnote" id="paynote"></p>
+    </section>
+    <section>
       <h2>Samanburður í raunkrónum</h2>
       <table id="tbl"></table>
     </section>
@@ -99,11 +135,11 @@ footer{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);font-si
       <div class="match" id="match"></div>
     </section>
     <footer>
-      Reiknilíkanið notar raunkrónur (verðlag dagsins í dag) svo lánaformin séu samanburðarhæf.
-      Aukaafborganir stytta lánstímann (greiðsla helst óbreytt). Verðbætur eru reiknaðar án tveggja
-      mánaða tafar í þessari framvirku útgáfu. Þetta er reiknivél, ekki fjármálaráðgjöf —
-      berðu niðurstöður saman við raunveruleg vaxtakjör frá þínum banka.
-      Opinn kóði og söguleg bakprófun: sjá GitHub.
+      Vextir eru reiknaðir út frá stýrivöxtum og veðhlutfalli eftir skilmálum Íslandsbanka
+      (óverðtryggt álag 2,25–3,35%, verðtryggt gólf 3,50–4,75% eftir veðhlutfalli) — þú getur
+      fínstillt þá handvirkt. Reiknilíkanið notar raunkrónur svo lánaformin séu samanburðarhæf.
+      Þetta er reiknivél, ekki fjármálaráðgjöf — berðu niðurstöður saman við raunveruleg
+      vaxtakjör frá þínum banka. Opinn kóði og söguleg bakprófun: sjá GitHub.
     </footer>
   </div>
 </main>
@@ -113,14 +149,16 @@ footer{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);font-si
 const M=12;
 function annuity(P,r,n){return r===0?P/n:P*r*Math.pow(1+r,n)/(Math.pow(1+r,n)-1);}
 // returns {payNom[],payReal[],balReal[],months,totalNom,totalReal}
-function simulate(P,annualRate,years,indexed,infl,ptype,targetPay){
+function simulate(P,annualRate,years,indexed,infl,ptype,targetPay,recalc){
   const n=years*M,g=Math.pow(1+infl,1/M),horizon=n*3;
   const mr=annualRate/M;let bal=P,f=1,t=0;
-  const payNom=[],balReal=[];let totNom=0,totReal=0;
-  const schedA=annuity(P,mr,n),inst=P/n;
+  const payNom=[],payReal=[],balReal=[];let totNom=0,totReal=0;
+  const schedA=annuity(P,mr,n),inst0=P/n;
   while(bal>1e-6&&t<horizon){
     const interest=bal*mr;
-    let schedUnit=ptype==="annuity"?Math.min(schedA,bal+interest):Math.min(inst+interest,bal+interest);
+    const sA=recalc?annuity(bal,mr,Math.max(n-t,1)):schedA;
+    const sI=recalc?bal/Math.max(n-t,1):inst0;
+    let schedUnit=ptype==="annuity"?Math.min(sA,bal+interest):Math.min(sI+interest,bal+interest);
     let totalNom,totalUnit;
     if(indexed){ // unit = real krónur
       totalNom=schedUnit*f;
@@ -132,36 +170,61 @@ function simulate(P,annualRate,years,indexed,infl,ptype,targetPay){
       totalNom=Math.min(totalNom,bal+interest);totalUnit=totalNom;
     }
     bal=bal+interest-totalUnit;
-    payNom.push(totalNom);totNom+=totalNom;totReal+=totalNom/f;
+    payNom.push(totalNom);payReal.push(totalNom/f);totNom+=totalNom;totReal+=totalNom/f;
     balReal.push(indexed?bal:bal/f);
     f*=g;t++;
   }
-  return{payNom,balReal,months:t,totalNom:totNom,totalReal:totReal};
+  return{payNom,payReal,balReal,months:t,totalNom:totNom,totalReal:totReal};
 }
 function bisect(fn,lo,hi,iters=45){for(let i=0;i<iters;i++){const m=(lo+hi)/2;if(fn(m))lo=m;else hi=m;}return(lo+hi)/2;}
-const kr=v=>Math.round(v).toLocaleString("is-IS")+" kr.";
-const mkr=v=>(v/1e6).toLocaleString("is-IS",{maximumFractionDigits:1})+" m.kr.";
-const pct=v=>(v*100).toLocaleString("is-IS",{minimumFractionDigits:1,maximumFractionDigits:1})+"%";
+const isNum=(v,d=0)=>{const s=v.toFixed(d).split(".");return s[0].replace(/\B(?=(\d{3})+(?!\d))/g,".")+(s[1]?","+s[1]:"");};
+const kr=v=>isNum(Math.round(v))+" kr.";
+const mkr=v=>isNum(v/1e6,1)+" m.kr.";
+const pct=v=>isNum(v*100,1)+"%";
+const yrs=v=>isNum(v,1)+" ár";
 const $=id=>document.getElementById(id);
-const inputs=["principal","rr","nr","years","ptype","infl","pay"].map($);
+
+// Íslandsbanki-style rate construction from policy rate + loan-to-value.
+// óverðtryggt margin: 2.25% (low LTV) → 3.35% (high LTV), linear across 50–80%.
+// verðtryggt real rate: floor 3.50% (low LTV) → 4.75% (high LTV), same interp.
+function ratesFromLtv(policy,ltv){
+  const f=Math.max(0,Math.min(1,(ltv-0.50)/(0.80-0.50)));
+  const margin=0.0225+f*(0.0335-0.0225);
+  const real=0.035+f*(0.0475-0.035);
+  return{nominal:policy+margin, real, margin, ltv};
+}
+
+const inputs=["principal","propval","policy","rr","nr","years","ptype","omode","infl","pay"].map($);
 let payTouched=false;
 $("pay").addEventListener("input",()=>payTouched=true);
 inputs.forEach(el=>el.addEventListener("input",render));
 
 function render(){
-  const P=+$("principal").value||0,rr=+$("rr").value/100,nr=+$("nr").value/100,
-        Y=+$("years").value||30,ptype=$("ptype").value,infl=+$("infl").value/100;
+  const P=+$("principal").value||0,propval=+$("propval").value||P,
+        policy=+$("policy").value/100,
+        Y=+$("years").value||30,ptype=$("ptype").value,infl=+$("infl").value/100,
+        rc=$("omode").value==="recalc";
+  const ltv=Math.min(P/propval,1.5);
+  const d=ratesFromLtv(policy,ltv);
+  // blank override field = use derived rate; a typed value overrides it
+  const rrOv=$("rr").value.trim(), nrOv=$("nr").value.trim();
+  const rr=rrOv===""?d.real:+rrOv/100;
+  const nr=nrOv===""?d.nominal:+nrOv/100;
+  const ovR=rrOv!=="", ovN=nrOv!=="";
+  $("derived").innerHTML=`<span class="ltv">Veðhlutfall ${pct(ltv)}</span>
+    Óverðtryggðir: stýrivextir ${pct(policy)} + álag ${pct(d.margin)} = <b>${pct(d.nominal)}</b>${ovN?` <em>(handstillt: ${pct(nr)})</em>`:""}<br>
+    Verðtryggðir raunvextir (gólf): <b>${pct(d.real)}</b>${ovR?` <em>(handstillt: ${pct(rr)})</em>`:""}`;
   $("inflv").textContent=pct(infl);
-  const non=simulate(P,nr,Y,false,infl,ptype,null);
+  const non=simulate(P,nr,Y,false,infl,ptype,null,false);
   const defaultPay=Math.round(non.payNom[0]);
   if(!payTouched)$("pay").value=defaultPay;
   const userPay=+$("pay").value||defaultPay;
-  const vtP=simulate(P,rr,Y,true,infl,ptype,null);
-  const vtS=simulate(P,rr,Y,true,infl,ptype,userPay);
+  const vtP=simulate(P,rr,Y,true,infl,ptype,null,false);
+  const vtS=simulate(P,rr,Y,true,infl,ptype,userPay,rc);
   // breakeven: strategy pays first óvt payment at each candidate inflation
   const be=bisect(x=>{
-    const n2=simulate(P,nr,Y,false,x,ptype,null);
-    const s2=simulate(P,rr,Y,true,x,ptype,n2.payNom[0]);
+    const n2=simulate(P,nr,Y,false,x,ptype,null,false);
+    const s2=simulate(P,rr,Y,true,x,ptype,n2.payNom[0],rc);
     return s2.totalReal<n2.totalReal;
   },0,0.15);
   // verdict
@@ -169,54 +232,72 @@ function render(){
   const v=$("verdict");
   v.className="verdict"+(win?"":" lose");
   v.innerHTML=win
-    ?`Miðað við ${pct(infl)} verðbólgu <b>vinnur verðtryggða leiðin</b> með ${kr(userPay)} á mánuði — raunkostnaður ${mkr(diff)} lægri og lánið greitt upp á ${(vtS.months/12).toLocaleString("is-IS",{maximumFractionDigits:1})} árum.`
+    ?`Miðað við ${pct(infl)} verðbólgu <b>vinnur verðtryggða leiðin</b> með ${kr(userPay)} á mánuði — raunkostnaður ${mkr(diff)} lægri og lánið greitt upp á ${yrs(vtS.months/12).replace(" ár"," árum")}.`
     :`Miðað við ${pct(infl)} verðbólgu <b>vinnur óverðtryggða lánið</b> — verðtryggða leiðin kostar ${mkr(diff)} meira í raunkrónum. Jafnvægið liggur við ${pct(be)} verðbólgu.`;
   drawStrip(be,infl);
   drawChart(non,vtP,vtS,Y);
+  drawPayChart(non,vtP,vtS,rc);
   drawTable(non,vtP,vtS,userPay);
-  drawMatch(P,rr,Y,infl,ptype,non,vtP);
+  drawMatch(P,rr,Y,infl,ptype,non,vtP,rc);
 }
 function drawStrip(be,infl){
-  const min=0,max=0.12,X=x=>4+((x-min)/(max-min))*92; // percent coords
-  const mark=(x,color,lbl,dy)=>`
-    <line x1="${X(x)}%" y1="26" x2="${X(x)}%" y2="54" stroke="${color}" stroke-width="2.5"/>
-    <text x="${X(x)}%" y="${dy}" text-anchor="middle" font-size="12" font-family="Instrument Sans" fill="${color}" font-weight="600">${lbl}</text>`;
-  $("strip").innerHTML=`<svg viewBox="0 0 100 96" preserveAspectRatio="none" style="position:absolute;inset:0">
-    <rect x="4%" y="36" width="${X(be)-4}%" height="8" fill="var(--vt)" opacity=".25"/>
-    <rect x="${X(be)}%" y="36" width="${96-X(be)}%" height="8" fill="var(--ovt)" opacity=".25"/>
-    ${mark(0.025,"var(--muted)","Markmið SÍ 2,5%",16)}
-    ${mark(be,"var(--ink)","Þitt jafnvægi "+pct(be),76)}
-    ${mark(infl,"var(--vt)","Forsenda "+pct(infl),16)}
-    <text x="4%" y="92" font-size="11" fill="var(--vt)" font-family="Instrument Sans">← verðtryggt vinnur</text>
-    <text x="96%" y="92" font-size="11" fill="var(--ovt)" text-anchor="end" font-family="Instrument Sans">óverðtryggt vinnur →</text>
+  const min=0,max=0.12,X=x=>4+((x-min)/(max-min))*92; // percent of width
+  const mark=(x,color,y1,y2)=>`<line x1="${X(x)}%" y1="${y1}" x2="${X(x)}%" y2="${y2}" stroke="${color}" stroke-width="2.5"/>`;
+  const lbl=(x,color,text,y,bold)=>`<text x="${X(x)}%" y="${y}" text-anchor="middle" font-size="12" font-family="Instrument Sans" fill="${color}" font-weight="${bold?700:600}">${text}</text>`;
+  $("strip").innerHTML=`<svg style="position:absolute;inset:0">
+    <rect x="4%" y="52" width="${X(be)-4}%" height="8" fill="var(--vt)" opacity=".25"/>
+    <rect x="${X(be)}%" y="52" width="${96-X(be)}%" height="8" fill="var(--ovt)" opacity=".25"/>
+    ${mark(0.025,"var(--muted)",40,72)}${lbl(0.025,"var(--muted)","Markmið SÍ 2,5%",16)}
+    ${mark(infl,"var(--vt)",40,72)}${lbl(infl,"var(--vt)","Forsenda "+pct(infl),34)}
+    ${mark(be,"var(--ink)",40,72)}${lbl(be,"var(--ink)","Þitt jafnvægi "+pct(be),90,true)}
+    <text x="4%" y="112" font-size="11" fill="var(--vt)" font-family="Instrument Sans">← verðtryggt vinnur</text>
+    <text x="96%" y="112" font-size="11" fill="var(--ovt)" text-anchor="end" font-family="Instrument Sans">óverðtryggt vinnur →</text>
   </svg>`;
 }
 function drawChart(non,vtP,vtS,Y){
-  const c=$("chart"),dpr=window.devicePixelRatio||1,W=c.clientWidth;
-  c.width=W*dpr;c.height=360*dpr;
-  const ctx=c.getContext("2d");ctx.scale(dpr,dpr);ctx.clearRect(0,0,W,360);
-  const series=[[non.balReal,"#C6472E"],[vtP.balReal,"#8FB6BD"],[vtS.balReal,"#0F7A8A"]];
+  paintLines($("chart"),360,[[non.balReal,"#C6472E"],[vtP.balReal,"#8FB6BD"],[vtS.balReal,"#0F7A8A"]]);
+}
+let payMode="nom",last=null;
+function drawPayChart(non,vtP,vtS,rc){
+  last={non,vtP,vtS,rc};
+  const k=payMode==="nom"?"payNom":"payReal";
+  paintLines($("paychart"),300,[[non[k],"#C6472E"],[vtP[k],"#8FB6BD"],[vtS[k],"#0F7A8A"]]);
+  const cross=vtS.payNom.findIndex((p,i)=>i>0&&p>non.payNom[0]+1);
+  $("paynote").textContent=payMode==="nom"
+    ?(rc
+      ?"Bankinn endurreiknar greiðsluna mánaðarlega á núverandi höfuðstól — aukagreiðslurnar lækka næstu áskildu greiðslur í stað þess að stytta lánið. Verðbæturnar vinna á móti og áskilda greiðslan vex samt með tímanum. Berðu saman við hinn valkostinn til að sjá hvað föst greiðsluáætlun (stytting lánstíma) sparar."
+      :(cross>0?`Fyrstu ${yrs(cross/12).replace(" ár"," árin")} greiðir þú það sama og óverðtryggða lánið krefst. Eftir það vex áskilin greiðsla verðtryggða lánsins fram úr — það er aukaeldsneytið sem klárar lánið fyrr.`
+        :"Áskilin greiðsla verðtryggða lánsins fer aldrei fram úr viðmiðunargreiðslunni á þessum forsendum."))
+    :"Á raunvirði rýrnar föst greiðsla óverðtryggða lánsins jafnt og þétt — verðbólgan greiðir hluta lánsins fyrir lántakann. Það er mótvægið á móti hraðari eignamyndun verðtryggðu leiðarinnar.";
+}
+function paintLines(c,H,series){
+  const dpr=window.devicePixelRatio||1,W=c.clientWidth;
+  c.width=W*dpr;c.height=H*dpr;
+  const ctx=c.getContext("2d");ctx.scale(dpr,dpr);ctx.clearRect(0,0,W,H);
   const n=Math.max(...series.map(s=>s[0].length)),ymax=Math.max(...series.flatMap(s=>s[0]))*1.05;
-  const L=64,R=14,T=16,B=34,pw=W-L-R,ph=360-T-B;
+  const L=64,R=14,T=16,B=34,pw=W-L-R,ph=H-T-B;
   ctx.strokeStyle="#E8EFF1";ctx.fillStyle="#5C6E78";ctx.font="11px Instrument Sans";
-  for(let i=0;i<=4;i++){const y=T+ph*i/4;ctx.beginPath();ctx.moveTo(L,y);ctx.lineTo(W-R,y);ctx.stroke();
-    ctx.fillText((ymax*(1-i/4)/1e6).toFixed(0)+" m",8,y+4);}
-  for(let yr=0;yr<=n/12;yr+=5){const x=L+pw*(yr*12)/n;ctx.fillText(yr+" ár",x-10,352);}
+  const big=ymax>2e6;
+  for(let i=0;i<=4;i++){const y=T+ph*i/4,v=ymax*(1-i/4);ctx.beginPath();ctx.moveTo(L,y);ctx.lineTo(W-R,y);ctx.stroke();
+    ctx.fillText(big?(v/1e6).toFixed(0)+" m":isNum(Math.round(v/1000))+" þ",8,y+4);}
+  for(let yr=0;yr<=n/12;yr+=5){const x=L+pw*(yr*12)/n;ctx.fillText(yr+" ár",x-10,H-8);}
   series.forEach(([data,col])=>{ctx.strokeStyle=col;ctx.lineWidth=2.2;ctx.beginPath();
     data.forEach((v,i)=>{const x=L+pw*i/n,y=T+ph*(1-v/ymax);i?ctx.lineTo(x,y):ctx.moveTo(x,y);});ctx.stroke();});
 }
+$("tgNom").addEventListener("click",()=>{payMode="nom";$("tgNom").classList.add("on");$("tgReal").classList.remove("on");if(last)drawPayChart(last.non,last.vtP,last.vtS,last.rc);});
+$("tgReal").addEventListener("click",()=>{payMode="real";$("tgReal").classList.add("on");$("tgNom").classList.remove("on");if(last)drawPayChart(last.non,last.vtP,last.vtS,last.rc);});
 function drawTable(non,vtP,vtS,userPay){
   const rows=[["#C6472E","Óverðtryggt",non],["#8FB6BD","Verðtryggt, engin aukagreiðsla",vtP],["#0F7A8A","Verðtryggt + "+kr(userPay)+"/mán",vtS]];
   $("tbl").innerHTML=`<tr><th>Leið</th><th>Fyrsta greiðsla</th><th>Uppgreitt eftir</th><th>Heildarkostnaður (raun)</th></tr>`+
     rows.map(([c,name,r])=>`<tr><td><span class="dot" style="background:${c}"></span>${name}</td>
-      <td>${kr(r.payNom[0])}</td><td>${(r.months/12).toLocaleString("is-IS",{maximumFractionDigits:1})} ár</td>
+      <td>${kr(r.payNom[0])}</td><td>${yrs(r.months/12)}</td>
       <td>${mkr(r.totalReal)}</td></tr>`).join("");
 }
-function drawMatch(P,rr,Y,infl,ptype,non,vtP){
+function drawMatch(P,rr,Y,infl,ptype,non,vtP,rc){
   const h=Math.min(120,non.balReal.length-1),target=non.balReal[h];
   const req=vtP.payNom[0];
   const total=bisect(x=>{
-    const s=simulate(P,rr,Y,true,infl,ptype,x);
+    const s=simulate(P,rr,Y,true,infl,ptype,x,rc);
     return h<s.balReal.length?s.balReal[h]>target:false;
   },req,req*5);
   $("match").innerHTML=`Til að eftirstöðvar verðtryggða lánsins (á raunvirði) standi jafnfætis
