@@ -9,7 +9,7 @@ höfuðstólinn í hverjum mánuði.
 
 ## Prófaðu reiknivélina
 
-Opnaðu https://github.com/arnarjokull00-ui/lanareiknir í vafra — engin uppsetning.
+Opnaðu https://arnarjokull00-ui.github.io/lanareiknir/ í vafra — engin uppsetning.
 Þú stillir höfuðstól, vexti, verðbólgu og mánaðargreiðslu og sérð strax hvor
 leiðin vinnur, hvenær lánið greiðist upp og hvað jöfn eignamyndun kostar miðað við verðbólgu.
 
