@@ -1,7 +1,7 @@
 # Lánareiknir — verðtryggt eða óverðtryggt?
 
 Reiknivél og greiningartól sem ber saman verðtryggð og óverðtryggð húsnæðislán
-— og svarar spurningu sem hefðbundnar reiknivélar svara ekki:
+— og svarar spurningunni:
 
 **Hvað gerist ef þú tekur verðtryggt lán en greiðir samt jafn háa mánaðargreiðslu
 og óverðtryggða lánið hefði krafist?** Mismunurinn fer þá sem aukaafborgun inn á
@@ -9,9 +9,9 @@ höfuðstólinn í hverjum mánuði.
 
 ## Prófaðu reiknivélina
 
-Opnaðu `web/index.html` í vafra — engin uppsetning, engin gögn send neitt.
+Opnaðu https://github.com/arnarjokull00-ui/lanareiknir í vafra — engin uppsetning.
 Þú stillir höfuðstól, vexti, verðbólgu og mánaðargreiðslu og sérð strax hvor
-leiðin vinnur, hvenær lánið greiðist upp og hvað jöfn eignamyndun kostar.
+leiðin vinnur, hvenær lánið greiðist upp og hvað jöfn eignamyndun kostar miðað við verðbólgu.
 
 ## Helstu niðurstöður
 
@@ -21,7 +21,7 @@ verðtryggða leiðin með aukagreiðslum — yfir því vinnur óverðtryggða 
 Verðbólgumarkmið Seðlabankans er 2,5%.
 
 **Sagan 2015–2025:** keyrt á raunverulegri verðbólgu (Hagstofan) og
-stýrivaxtaferli tímabilsins — þar með talið verðbólguskotið 2022–2023 — er
+stýrivaxtaferli tímabilsins — þar með talið verðbólgutímabilið 2022–2023 — er
 niðurstaðan háð vaxtaálagi óverðtryggða lánsins, sem ræðst af veðhlutfalli:
 
 | Vaxtaálag (veðhlutfall) | Hvor vann? | Munur |
@@ -30,16 +30,11 @@ niðurstaðan háð vaxtaálagi óverðtryggða lánsins, sem ræðst af veðhlu
 | 3,00% (miðlungs) | Verðtryggt + aukagreiðslur | 3,2 m.kr. |
 | 3,35% (hátt veðhlutfall) | Verðtryggt + aukagreiðslur | 4,9 m.kr. |
 
-**Varúð við sjálfgefna stillingu bankans:** þegar greiðslan er endurreiknuð
-mánaðarlega (venjan) gleypir endurútreikningurinn aukagreiðslurnar — lánið
-styttist ekki og ávinningurinn hverfur. Til að leiðin virki þarf annaðhvort að
-biðja um styttingu lánstíma eða halda alltaf áfram að greiða fullu upphæðina
-þótt áskilda greiðslan lækki.
 
 **Að greiða bara lágmarkið af verðtryggðu láni** reyndist dýrasta leiðin í
 öllum sviðsmyndum.
 
-## Fyrir forritara
+## Fyrir bakprófun
 
 ```bash
 pip install numpy pandas pytest requests
@@ -49,8 +44,7 @@ python -m lanareiknir.backtest       # söguleg keyrsla + næmnigreining
 
 Python-vélin (`lanareiknir/`) styður bæði jafnar greiðslur og jafnar
 afborganir, sögulegar verðbólgu- og vaxtaslóðir, og sækir vísitölu neysluverðs
-beint frá Hagstofunni. JavaScript-vélin í reiknivélinni gefur sömu niðurstöður
-og Python-vélin upp á krónu.
+beint frá Hagstofunni. 
 
 ## Fyrirvari
 
