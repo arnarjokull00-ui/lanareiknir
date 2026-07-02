@@ -98,7 +98,7 @@ footer{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);font-si
     </select>
     <label for="omode">Áhrif aukaafborgunar</label>
     <select id="omode">
-      <option value="recalc">Greiðsla endurreiknuð mánaðarlega (venja banka)</option>
+      <option value="recalc">Greiðsla endurreiknuð mánaðarlega</option>
       <option value="shorten">Styttir lánstíma (föst greiðsluáætlun)</option>
     </select>
     <label for="infl">Verðbólga að meðaltali: <span class="rangeval" id="inflv">5,0%</span></label>
@@ -302,8 +302,7 @@ function drawMatch(P,rr,Y,infl,ptype,non,vtP,rc){
   },req,req*5);
   $("match").innerHTML=`Til að eftirstöðvar verðtryggða lánsins (á raunvirði) standi jafnfætis
     óverðtryggða láninu eftir <b>10 ár</b> þarftu að greiða <strong>${kr(total)}</strong> á mánuði —
-    það er ${kr(total-req)} umfram lágmarksgreiðsluna. Þetta er talan sem enginn hefðbundinn
-    reiknir sýnir: verðið á sömu eignamyndun.`;
+    það er ${kr(total-req)} umfram lágmarksgreiðsluna.`;
 }
 render();
 window.addEventListener("resize",render);
