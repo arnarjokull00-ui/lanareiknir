@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="is">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lánareiknir — verðtryggt eða óverðtryggt?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Instrument+Sans:wght@400;500;600&family=Spline+Sans+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F4F7F8; --ink:#17242D; --vt:#0F7A8A; --ovt:#C6472E;
+  --line:#D7DFE3; --soft:#E8EFF1; --muted:#5C6E78;
+}
+*{box-sizing:border-box;margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.55 "Instrument Sans",system-ui,sans-serif;padding:0 20px 80px}
+.wrap{max-width:1060px;margin:0 auto}
+header{padding:44px 0 28px;border-bottom:1px solid var(--line)}
+h1{font-family:"Bricolage Grotesque",serif;font-weight:700;font-size:clamp(28px,4.5vw,44px);letter-spacing:-.02em;line-height:1.08}
+h1 .vt{color:var(--vt)} h1 .ovt{color:var(--ovt)}
+header p{color:var(--muted);margin-top:10px;max-width:56ch}
+main{display:grid;grid-template-columns:320px 1fr;gap:36px;margin-top:32px}
+@media(max-width:820px){main{grid-template-columns:1fr}}
+.panel{align-self:start;position:sticky;top:16px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:22px}
+@media(max-width:820px){.panel{position:static}}
+.panel h2,section h2{font-family:"Bricolage Grotesque",serif;font-weight:500;font-size:15px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:14px}
+label{display:block;font-size:13px;font-weight:600;margin:14px 0 4px}
+label:first-of-type{margin-top:0}
+input[type=number],select{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:6px;font:inherit;font-family:"Spline Sans Mono",monospace;font-size:14px;background:var(--bg)}
+input:focus-visible,select:focus-visible,input[type=range]:focus-visible{outline:2px solid var(--vt);outline-offset:1px}
+.sub{font-size:12px;color:var(--muted);font-weight:400}
+input[type=range]{width:100%;accent-color:var(--vt);margin-top:6px}
+.rangeval{font-family:"Spline Sans Mono",monospace;font-weight:600;font-size:14px}
+section{margin-bottom:40px}
+.verdict{font-family:"Bricolage Grotesque",serif;font-weight:500;font-size:clamp(19px,2.4vw,24px);line-height:1.35;padding:18px 20px;background:#fff;border-left:4px solid var(--vt);border-radius:0 10px 10px 0}
+.verdict.lose{border-left-color:var(--ovt)}
+/* signature: breakeven strip */
+.strip{position:relative;height:96px;margin-top:8px}
+.strip svg{width:100%;height:100%;overflow:visible}
+table{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+th,td{padding:10px 14px;text-align:right;font-size:14px;border-bottom:1px solid var(--soft)}
+th:first-child,td:first-child{text-align:left}
+th{font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);background:var(--soft)}
+td{font-family:"Spline Sans Mono",monospace}
+td:first-child{font-family:"Instrument Sans",sans-serif;font-weight:500}
+tr:last-child td{border-bottom:0}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:7px;vertical-align:1px}
+canvas{width:100%;background:#fff;border:1px solid var(--line);border-radius:10px}
+.match{background:#fff;border:1px solid var(--line);border-radius:10px;padding:18px 20px}
+.match strong{font-family:"Spline Sans Mono",monospace;font-size:20px;color:var(--vt)}
+footer{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);font-size:13px;color:var(--muted);max-width:70ch}
+@media(prefers-reduced-motion:no-preference){.verdict,.strip{transition:border-color .3s}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1><span class="vt">Verðtryggt</span> eða <span class="ovt">óverðtryggt</span>?</h1>
+  <p>Berðu saman raunkostnað lánaformanna — og skoðaðu hvað gerist ef þú tekur verðtryggt lán en greiðir samt jafn mikið og óverðtryggða lánið hefði krafist. Mismunurinn fer sem aukaafborgun inn á höfuðstólinn.</p>
+</header>
+<main>
+  <div class="panel">
+    <h2>Forsendur</h2>
+    <label for="principal">Höfuðstóll (kr.)</label>
+    <input type="number" id="principal" value="43000000" step="1000000" min="1000000">
+    <label for="rr">Verðtryggðir vextir <span class="sub">(raunvextir, %)</span></label>
+    <input type="number" id="rr" value="4.0" step="0.05" min="0" max="15">
+    <label for="nr">Óverðtryggðir vextir <span class="sub">(nafnvextir, %)</span></label>
+    <input type="number" id="nr" value="9.0" step="0.05" min="0" max="20">
+    <label for="years">Lánstími (ár)</label>
+    <input type="number" id="years" value="30" step="5" min="5" max="40">
+    <label for="ptype">Greiðslufyrirkomulag</label>
+    <select id="ptype">
+      <option value="annuity">Jafnar greiðslur (annuitet)</option>
+      <option value="equal_principal">Jafnar afborganir</option>
+    </select>
+    <label for="infl">Verðbólga að meðaltali: <span class="rangeval" id="inflv">5,0%</span></label>
+    <input type="range" id="infl" min="0" max="12" step="0.1" value="5.0" aria-label="Verðbólguforsenda í prósentum">
+    <label for="pay">Mánaðargreiðsla þín (kr.) <span class="sub">— sjálfgefið: greiðsla óverðtryggða lánsins</span></label>
+    <input type="number" id="pay" step="10000" min="0">
+  </div>
+  <div>
+    <section>
+      <p class="verdict" id="verdict" aria-live="polite"></p>
+    </section>
+    <section>
+      <h2>Jafnvægisverðbólgan — hvar liggur þín lína?</h2>
+      <div class="strip" id="strip"></div>
+    </section>
+    <section>
+      <h2>Raunstaða höfuðstóls yfir tíma</h2>
+      <canvas id="chart" height="360" role="img" aria-label="Línurit sem sýnir raunvirði eftirstöðva þriggja lánaleiða yfir lánstímann"></canvas>
+    </section>
+    <section>
+      <h2>Samanburður í raunkrónum</h2>
+      <table id="tbl"></table>
+    </section>
+    <section>
+      <h2>Að halda í við eignamyndun óverðtryggða lánsins</h2>
+      <div class="match" id="match"></div>
+    </section>
+    <footer>
+      Reiknilíkanið notar raunkrónur (verðlag dagsins í dag) svo lánaformin séu samanburðarhæf.
+      Aukaafborganir stytta lánstímann (greiðsla helst óbreytt). Verðbætur eru reiknaðar án tveggja
+      mánaða tafar í þessari framvirku útgáfu. Þetta er reiknivél, ekki fjármálaráðgjöf —
+      berðu niðurstöður saman við raunveruleg vaxtakjör frá þínum banka.
+      Opinn kóði og söguleg bakprófun: sjá GitHub.
+    </footer>
+  </div>
+</main>
+</div>
+<script>
+"use strict";
+const M=12;
+function annuity(P,r,n){return r===0?P/n:P*r*Math.pow(1+r,n)/(Math.pow(1+r,n)-1);}
+// returns {payNom[],payReal[],balReal[],months,totalNom,totalReal}
+function simulate(P,annualRate,years,indexed,infl,ptype,targetPay){
+  const n=years*M,g=Math.pow(1+infl,1/M),horizon=n*3;
+  const mr=annualRate/M;let bal=P,f=1,t=0;
+  const payNom=[],balReal=[];let totNom=0,totReal=0;
+  const schedA=annuity(P,mr,n),inst=P/n;
+  while(bal>1e-6&&t<horizon){
+    const interest=bal*mr;
+    let schedUnit=ptype==="annuity"?Math.min(schedA,bal+interest):Math.min(inst+interest,bal+interest);
+    let totalNom,totalUnit;
+    if(indexed){ // unit = real krónur
+      totalNom=schedUnit*f;
+      if(targetPay!=null)totalNom=Math.max(totalNom,targetPay);
+      totalUnit=Math.min(totalNom/f,bal+interest);totalNom=totalUnit*f;
+    }else{ // unit = nominal krónur
+      totalNom=schedUnit;
+      if(targetPay!=null)totalNom=Math.max(totalNom,targetPay);
+      totalNom=Math.min(totalNom,bal+interest);totalUnit=totalNom;
+    }
+    bal=bal+interest-totalUnit;
+    payNom.push(totalNom);totNom+=totalNom;totReal+=totalNom/f;
+    balReal.push(indexed?bal:bal/f);
+    f*=g;t++;
+  }
+  return{payNom,balReal,months:t,totalNom:totNom,totalReal:totReal};
+}
+function bisect(fn,lo,hi,iters=45){for(let i=0;i<iters;i++){const m=(lo+hi)/2;if(fn(m))lo=m;else hi=m;}return(lo+hi)/2;}
+const kr=v=>Math.round(v).toLocaleString("is-IS")+" kr.";
+const mkr=v=>(v/1e6).toLocaleString("is-IS",{maximumFractionDigits:1})+" m.kr.";
+const pct=v=>(v*100).toLocaleString("is-IS",{minimumFractionDigits:1,maximumFractionDigits:1})+"%";
+const $=id=>document.getElementById(id);
+const inputs=["principal","rr","nr","years","ptype","infl","pay"].map($);
+let payTouched=false;
+$("pay").addEventListener("input",()=>payTouched=true);
+inputs.forEach(el=>el.addEventListener("input",render));
+
+function render(){
+  const P=+$("principal").value||0,rr=+$("rr").value/100,nr=+$("nr").value/100,
+        Y=+$("years").value||30,ptype=$("ptype").value,infl=+$("infl").value/100;
+  $("inflv").textContent=pct(infl);
+  const non=simulate(P,nr,Y,false,infl,ptype,null);
+  const defaultPay=Math.round(non.payNom[0]);
+  if(!payTouched)$("pay").value=defaultPay;
+  const userPay=+$("pay").value||defaultPay;
+  const vtP=simulate(P,rr,Y,true,infl,ptype,null);
+  const vtS=simulate(P,rr,Y,true,infl,ptype,userPay);
+  // breakeven: strategy pays first óvt payment at each candidate inflation
+  const be=bisect(x=>{
+    const n2=simulate(P,nr,Y,false,x,ptype,null);
+    const s2=simulate(P,rr,Y,true,x,ptype,n2.payNom[0]);
+    return s2.totalReal<n2.totalReal;
+  },0,0.15);
+  // verdict
+  const win=vtS.totalReal<non.totalReal,diff=Math.abs(vtS.totalReal-non.totalReal);
+  const v=$("verdict");
+  v.className="verdict"+(win?"":" lose");
+  v.innerHTML=win
+    ?`Miðað við ${pct(infl)} verðbólgu <b>vinnur verðtryggða leiðin</b> með ${kr(userPay)} á mánuði — raunkostnaður ${mkr(diff)} lægri og lánið greitt upp á ${(vtS.months/12).toLocaleString("is-IS",{maximumFractionDigits:1})} árum.`
+    :`Miðað við ${pct(infl)} verðbólgu <b>vinnur óverðtryggða lánið</b> — verðtryggða leiðin kostar ${mkr(diff)} meira í raunkrónum. Jafnvægið liggur við ${pct(be)} verðbólgu.`;
+  drawStrip(be,infl);
+  drawChart(non,vtP,vtS,Y);
+  drawTable(non,vtP,vtS,userPay);
+  drawMatch(P,rr,Y,infl,ptype,non,vtP);
+}
+function drawStrip(be,infl){
+  const min=0,max=0.12,X=x=>4+((x-min)/(max-min))*92; // percent coords
+  const mark=(x,color,lbl,dy)=>`
+    <line x1="${X(x)}%" y1="26" x2="${X(x)}%" y2="54" stroke="${color}" stroke-width="2.5"/>
+    <text x="${X(x)}%" y="${dy}" text-anchor="middle" font-size="12" font-family="Instrument Sans" fill="${color}" font-weight="600">${lbl}</text>`;
+  $("strip").innerHTML=`<svg viewBox="0 0 100 96" preserveAspectRatio="none" style="position:absolute;inset:0">
+    <rect x="4%" y="36" width="${X(be)-4}%" height="8" fill="var(--vt)" opacity=".25"/>
+    <rect x="${X(be)}%" y="36" width="${96-X(be)}%" height="8" fill="var(--ovt)" opacity=".25"/>
+    ${mark(0.025,"var(--muted)","Markmið SÍ 2,5%",16)}
+    ${mark(be,"var(--ink)","Þitt jafnvægi "+pct(be),76)}
+    ${mark(infl,"var(--vt)","Forsenda "+pct(infl),16)}
+    <text x="4%" y="92" font-size="11" fill="var(--vt)" font-family="Instrument Sans">← verðtryggt vinnur</text>
+    <text x="96%" y="92" font-size="11" fill="var(--ovt)" text-anchor="end" font-family="Instrument Sans">óverðtryggt vinnur →</text>
+  </svg>`;
+}
+function drawChart(non,vtP,vtS,Y){
+  const c=$("chart"),dpr=window.devicePixelRatio||1,W=c.clientWidth;
+  c.width=W*dpr;c.height=360*dpr;
+  const ctx=c.getContext("2d");ctx.scale(dpr,dpr);ctx.clearRect(0,0,W,360);
+  const series=[[non.balReal,"#C6472E"],[vtP.balReal,"#8FB6BD"],[vtS.balReal,"#0F7A8A"]];
+  const n=Math.max(...series.map(s=>s[0].length)),ymax=Math.max(...series.flatMap(s=>s[0]))*1.05;
+  const L=64,R=14,T=16,B=34,pw=W-L-R,ph=360-T-B;
+  ctx.strokeStyle="#E8EFF1";ctx.fillStyle="#5C6E78";ctx.font="11px Instrument Sans";
+  for(let i=0;i<=4;i++){const y=T+ph*i/4;ctx.beginPath();ctx.moveTo(L,y);ctx.lineTo(W-R,y);ctx.stroke();
+    ctx.fillText((ymax*(1-i/4)/1e6).toFixed(0)+" m",8,y+4);}
+  for(let yr=0;yr<=n/12;yr+=5){const x=L+pw*(yr*12)/n;ctx.fillText(yr+" ár",x-10,352);}
+  series.forEach(([data,col])=>{ctx.strokeStyle=col;ctx.lineWidth=2.2;ctx.beginPath();
+    data.forEach((v,i)=>{const x=L+pw*i/n,y=T+ph*(1-v/ymax);i?ctx.lineTo(x,y):ctx.moveTo(x,y);});ctx.stroke();});
+}
+function drawTable(non,vtP,vtS,userPay){
+  const rows=[["#C6472E","Óverðtryggt",non],["#8FB6BD","Verðtryggt, engin aukagreiðsla",vtP],["#0F7A8A","Verðtryggt + "+kr(userPay)+"/mán",vtS]];
+  $("tbl").innerHTML=`<tr><th>Leið</th><th>Fyrsta greiðsla</th><th>Uppgreitt eftir</th><th>Heildarkostnaður (raun)</th></tr>`+
+    rows.map(([c,name,r])=>`<tr><td><span class="dot" style="background:${c}"></span>${name}</td>
+      <td>${kr(r.payNom[0])}</td><td>${(r.months/12).toLocaleString("is-IS",{maximumFractionDigits:1})} ár</td>
+      <td>${mkr(r.totalReal)}</td></tr>`).join("");
+}
+function drawMatch(P,rr,Y,infl,ptype,non,vtP){
+  const h=Math.min(120,non.balReal.length-1),target=non.balReal[h];
+  const req=vtP.payNom[0];
+  const total=bisect(x=>{
+    const s=simulate(P,rr,Y,true,infl,ptype,x);
+    return h<s.balReal.length?s.balReal[h]>target:false;
+  },req,req*5);
+  $("match").innerHTML=`Til að eftirstöðvar verðtryggða lánsins (á raunvirði) standi jafnfætis
+    óverðtryggða láninu eftir <b>10 ár</b> þarftu að greiða <strong>${kr(total)}</strong> á mánuði —
+    það er ${kr(total-req)} umfram lágmarksgreiðsluna. Þetta er talan sem enginn hefðbundinn
+    reiknir sýnir: verðið á sömu eignamyndun.`;
+}
+render();
+window.addEventListener("resize",render);
+</script>
+</body>
+</html>
