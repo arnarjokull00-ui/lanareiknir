@@ -9,7 +9,7 @@ höfuðstólinn í hverjum mánuði.
 
 ## Prófaðu reiknivélina
 
-Opnaðu https://arnarjokull00-ui.github.io/lanareiknir/ í vafra — engin uppsetning.
+Opnaðu https://arnarjokull00-ui.github.io/lanareiknir/ í vafra.
 Þú stillir höfuðstól, vexti, verðbólgu og mánaðargreiðslu og sérð strax hvor
 leiðin vinnur, hvenær lánið greiðist upp og hvað jöfn eignamyndun kostar miðað við verðbólgu.
 
@@ -17,7 +17,7 @@ leiðin vinnur, hvenær lánið greiðist upp og hvað jöfn eignamyndun kostar 
 
 **Allt veltur á verðbólgunni.** Miðað við 4% raunvexti og 9% nafnvexti liggur
 jafnvægið við um það bil 5,5% meðalverðbólgu yfir lánstímann. Undir því vinnur
-verðtryggða leiðin með aukagreiðslum — yfir því vinnur óverðtryggða lánið.
+verðtryggða leiðin með aukagreiðslum en yfir 5.5% vinnur óverðtryggða lánið.
 Verðbólgumarkmið Seðlabankans er 2,5%.
 
 **Sagan 2015–2025:** keyrt á raunverulegri verðbólgu (Hagstofan) og
@@ -42,7 +42,7 @@ python -m pytest tests/              # 8 próf
 python -m lanareiknir.backtest       # söguleg keyrsla + næmnigreining
 ```
 
-Python-vélin (`lanareiknir/`) styður bæði jafnar greiðslur og jafnar
+Python-kóðinn (`lanareiknir/`) styður bæði jafnar greiðslur og jafnar
 afborganir, sögulegar verðbólgu- og vaxtaslóðir, og sækir vísitölu neysluverðs
 beint frá Hagstofunni. 
 
