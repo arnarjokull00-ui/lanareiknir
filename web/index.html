@@ -144,8 +144,7 @@ footer{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);font-si
       Vextir eru reiknaðir út frá stýrivöxtum og veðhlutfalli eftir skilmálum Íslandsbanka
       (óverðtryggt álag 2,25–3,35%, verðtryggt gólf 3,50–4,75% eftir veðhlutfalli) — þú getur
       fínstillt þá handvirkt. Reiknilíkanið notar raunkrónur svo lánaformin séu samanburðarhæf.
-      Þetta er reiknivél, ekki fjármálaráðgjöf — berðu niðurstöður saman við raunveruleg
-      vaxtakjör frá þínum banka. Opinn kóði og söguleg bakprófun: sjá GitHub.
+      Þetta er reiknivél, ekki fjármálaráðgjöf. Opinn kóði og söguleg bakprófun: sjá GitHub.
     </footer>
   </div>
 </main>
@@ -287,10 +286,11 @@ function drawPayChart(non,vtP,vtS,rc){
   const cross=vtS.payNom.findIndex((p,i)=>i>0&&p>non.payNom[0]+1);
   $("paynote").textContent=payMode==="nom"
     ?(rc
-      ?"Bankinn endurreiknar greiðsluna mánaðarlega á núverandi höfuðstól — aukagreiðslurnar lækka næstu áskildu greiðslur í stað þess að stytta lánið. Verðbæturnar vinna á móti og áskilda greiðslan vex samt með tímanum. Berðu saman við hinn valkostinn til að sjá hvað föst greiðsluáætlun (stytting lánstíma) sparar."
-      :(cross>0?`Fyrstu ${yrs(cross/12).replace(" ár"," árin")} greiðir þú það sama og óverðtryggða lánið krefst. Eftir það vex áskilin greiðsla verðtryggða lánsins fram úr — það er aukaeldsneytið sem klárar lánið fyrr.`
+      ?"Bankinn endurreiknar greiðsluna mánaðarlega á núverandi höfuðstól."
+      :(cross>0
+        ?`Fyrstu ${yrs(cross/12).replace(" ár"," árin")} greiðir þú það sama og óverðtryggða lánið krefst. Eftir það vex áskilin greiðsla verðtryggða lánsins fram úr.`
         :"Áskilin greiðsla verðtryggða lánsins fer aldrei fram úr viðmiðunargreiðslunni á þessum forsendum."))
-    :"Á raunvirði rýrnar föst greiðsla óverðtryggða lánsins jafnt og þétt — verðbólgan greiðir hluta lánsins fyrir lántakann. Það er mótvægið á móti hraðari eignamyndun verðtryggðu leiðarinnar.";
+    :"Á raunvirði rýrnar föst greiðsla óverðtryggða lánsins jafnt og þétt.";
 }
 function paintLines(c,H,series){
   const dpr=window.devicePixelRatio||1,W=c.clientWidth;
@@ -326,8 +326,7 @@ function drawMatch(P,rr,Y,infl,ptype,non,vtP,rc){
   },req,req*5);
   $("match").innerHTML=`Til að eftirstöðvar verðtryggða lánsins (á raunvirði) standi jafnfætis
     óverðtryggða láninu eftir <b>10 ár</b> þarftu að greiða <strong>${kr(total)}</strong> á mánuði —
-    það er ${kr(total-req)} umfram lágmarksgreiðsluna. Þetta er talan sem enginn hefðbundinn
-    reiknir sýnir: verðið á sömu eignamyndun.`;
+    það er ${kr(total-req)} umfram lágmarksgreiðsluna.`;
 }
 render();
 window.addEventListener("resize",render);
