@@ -63,6 +63,7 @@ canvas{width:100%;background:#fff;border:1px solid var(--line);border-radius:10p
 .mktbtn{display:block;margin-top:8px;font:600 12px "Instrument Sans",sans-serif;padding:6px 10px;border:1px solid var(--vt);border-radius:6px;background:var(--soft);color:var(--vt);cursor:pointer;text-align:left;width:100%}
 .mktbtn:hover{background:var(--vt);color:#fff}
 .mktbtn:focus-visible{outline:2px solid var(--vt);outline-offset:2px}
+.mktnote{margin:6px 0 0;font-size:12px;line-height:1.35;color:var(--muted)}
 .match{background:#fff;border:1px solid var(--line);border-radius:10px;padding:18px 20px}
 .match strong{font-family:"Spline Sans Mono",monospace;font-size:20px;color:var(--vt)}
 footer{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);font-size:13px;color:var(--muted);max-width:70ch}
@@ -107,6 +108,7 @@ footer{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);font-si
     <label for="infl">Verðbólga að meðaltali: <span class="rangeval" id="inflv">5,0%</span></label>
     <input type="range" id="infl" min="0" max="12" step="0.1" value="5.0" aria-label="Verðbólguforsenda í prósentum">
     <button type="button" id="useMkt" class="mktbtn" hidden></button>
+    <p class="mktnote">Verðbólguálag er verðbólgan sem skuldabréfamarkaðurinn verðleggur út frá muninum á óverðtryggðum og verðtryggðum ríkisbréfum.</p>
     <label for="pay">Mánaðargreiðsla þín (kr.) <span class="sub">— sjálfgefið: greiðsla óverðtryggða lánsins</span></label>
     <input type="number" id="pay" step="10000" min="0">
   </div>
