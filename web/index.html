@@ -97,7 +97,7 @@ footer{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);font-si
     <input type="number" id="years" value="30" step="5" min="5" max="40">
     <label for="ptype">Greiðslufyrirkomulag</label>
     <select id="ptype">
-      <option value="annuity">Jafnar greiðslur (annuitet)</option>
+      <option value="annuity">Jafnar greiðslur</option>
       <option value="equal_principal">Jafnar afborganir</option>
     </select>
     <label for="omode">Áhrif aukaafborgunar</label>
@@ -142,7 +142,7 @@ footer{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);font-si
     </section>
     <footer>
       Vextir eru reiknaðir út frá stýrivöxtum og veðhlutfalli eftir skilmálum Íslandsbanka
-      (óverðtryggt álag 2,25–3,35%, verðtryggt gólf 3,50–4,75% eftir veðhlutfalli) — þú getur
+      (óverðtryggt álag 2,25–3,35%, verðtryggt 3,50–4,75% eftir veðhlutfalli) — þú getur
       fínstillt þá handvirkt. Reiknilíkanið notar raunkrónur svo lánaformin séu samanburðarhæf.
       Þetta er reiknivél, ekki fjármálaráðgjöf. Opinn kóði og söguleg bakprófun: sjá GitHub.
     </footer>
@@ -233,7 +233,7 @@ function render(){
   const ovR=rrOv!=="", ovN=nrOv!=="";
   $("derived").innerHTML=`<span class="ltv">Veðhlutfall ${pct(ltv)}</span>
     Óverðtryggðir: stýrivextir ${pct(policy)} + álag ${pct(d.margin)} = <b>${pct(d.nominal)}</b>${ovN?` <em>(handstillt: ${pct(nr)})</em>`:""}<br>
-    Verðtryggðir raunvextir (gólf): <b>${pct(d.real)}</b>${ovR?` <em>(handstillt: ${pct(rr)})</em>`:""}`;
+    Verðtryggðir raunvextir (eftir veðhlutfalli): <b>${pct(d.real)}</b>${ovR?` <em>(handstillt: ${pct(rr)})</em>`:""}`;
   $("inflv").textContent=pct(infl);
   const non=simulate(P,nr,Y,false,infl,ptype,null,false);
   const defaultPay=Math.round(non.payNom[0]);
