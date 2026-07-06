@@ -34,7 +34,7 @@ section{margin-bottom:40px}
 .verdict{font-family:"Bricolage Grotesque",serif;font-weight:500;font-size:clamp(19px,2.4vw,24px);line-height:1.35;padding:18px 20px;background:#fff;border-left:4px solid var(--vt);border-radius:0 10px 10px 0}
 .verdict.lose{border-left-color:var(--ovt)}
 /* signature: breakeven strip */
-.strip{position:relative;height:118px;margin-top:8px}
+.strip{position:relative;height:132px;margin-top:8px}
 .strip svg{width:100%;height:100%;overflow:visible}
 table{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--line);border-radius:10px;overflow:hidden}
 th,td{padding:10px 14px;text-align:right;font-size:14px;border-bottom:1px solid var(--soft)}
@@ -60,6 +60,9 @@ canvas{width:100%;background:#fff;border:1px solid var(--line);border-radius:10p
 .adv summary{cursor:pointer;font-size:13px;font-weight:600;color:var(--vt);padding:4px 0}
 .adv summary:focus-visible{outline:2px solid var(--vt);outline-offset:2px}
 .adv[open] summary{margin-bottom:6px}
+.mktbtn{display:block;margin-top:8px;font:600 12px "Instrument Sans",sans-serif;padding:6px 10px;border:1px solid var(--vt);border-radius:6px;background:var(--soft);color:var(--vt);cursor:pointer;text-align:left;width:100%}
+.mktbtn:hover{background:var(--vt);color:#fff}
+.mktbtn:focus-visible{outline:2px solid var(--vt);outline-offset:2px}
 .match{background:#fff;border:1px solid var(--line);border-radius:10px;padding:18px 20px}
 .match strong{font-family:"Spline Sans Mono",monospace;font-size:20px;color:var(--vt)}
 footer{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);font-size:13px;color:var(--muted);max-width:70ch}
@@ -103,6 +106,7 @@ footer{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);font-si
     </select>
     <label for="infl">Verðbólga að meðaltali: <span class="rangeval" id="inflv">5,0%</span></label>
     <input type="range" id="infl" min="0" max="12" step="0.1" value="5.0" aria-label="Verðbólguforsenda í prósentum">
+    <button type="button" id="useMkt" class="mktbtn" hidden></button>
     <label for="pay">Mánaðargreiðsla þín (kr.) <span class="sub">— sjálfgefið: greiðsla óverðtryggða lánsins</span></label>
     <input type="number" id="pay" step="10000" min="0">
   </div>
@@ -184,6 +188,21 @@ const pct=v=>isNum(v*100,1)+"%";
 const yrs=v=>isNum(v,1)+" ár";
 const $=id=>document.getElementById(id);
 
+// Market-implied 5y inflation (verðbólguálag) from RIKB/RIKS government bond
+// yields — computed by the verdbolgualag project. Loaded from market_be.json
+// when served (GitHub Pages); the constant below is the dated fallback so the
+// file works standalone too.
+let MKT_BE={breakeven_5y:0.0407,date:"2026-07-06"};
+function applyMktUi(){
+  const b=$("useMkt");
+  b.hidden=false;
+  b.textContent=`Nota verðbólguálag markaðarins: ${pct(MKT_BE.breakeven_5y)} (RIKB/RIKS, ${MKT_BE.date})`;
+}
+fetch("market_be.json").then(r=>r.ok?r.json():null).then(j=>{
+  if(j&&j.breakeven_5y>0&&j.breakeven_5y<0.2)MKT_BE=j;
+  applyMktUi();render();
+}).catch(()=>{applyMktUi();render();});
+
 // Íslandsbanki-style rate construction from policy rate + loan-to-value.
 // óverðtryggt margin: 2.25% (low LTV) → 3.35% (high LTV), linear across 50–80%.
 // verðtryggt real rate: floor 3.50% (low LTV) → 4.75% (high LTV), same interp.
@@ -248,10 +267,11 @@ function drawStrip(be,infl){
     <rect x="4%" y="52" width="${X(be)-4}%" height="8" fill="var(--vt)" opacity=".25"/>
     <rect x="${X(be)}%" y="52" width="${96-X(be)}%" height="8" fill="var(--ovt)" opacity=".25"/>
     ${mark(0.025,"var(--muted)",40,72)}${lbl(0.025,"var(--muted)","Markmið SÍ 2,5%",16)}
+    ${mark(MKT_BE.breakeven_5y,"var(--ovt)",40,72)}${lbl(MKT_BE.breakeven_5y,"var(--ovt)","Verðbólguálag "+pct(MKT_BE.breakeven_5y),104)}
     ${mark(infl,"var(--vt)",40,72)}${lbl(infl,"var(--vt)","Forsenda "+pct(infl),34)}
     ${mark(be,"var(--ink)",40,72)}${lbl(be,"var(--ink)","Þitt jafnvægi "+pct(be),90,true)}
-    <text x="4%" y="112" font-size="11" fill="var(--vt)" font-family="Instrument Sans">← verðtryggt vinnur</text>
-    <text x="96%" y="112" font-size="11" fill="var(--ovt)" text-anchor="end" font-family="Instrument Sans">óverðtryggt vinnur →</text>
+    <text x="4%" y="126" font-size="11" fill="var(--vt)" font-family="Instrument Sans">← verðtryggt vinnur</text>
+    <text x="96%" y="126" font-size="11" fill="var(--ovt)" text-anchor="end" font-family="Instrument Sans">óverðtryggt vinnur →</text>
   </svg>`;
 }
 function drawChart(non,vtP,vtS,Y){
@@ -284,6 +304,8 @@ function paintLines(c,H,series){
   series.forEach(([data,col])=>{ctx.strokeStyle=col;ctx.lineWidth=2.2;ctx.beginPath();
     data.forEach((v,i)=>{const x=L+pw*i/n,y=T+ph*(1-v/ymax);i?ctx.lineTo(x,y):ctx.moveTo(x,y);});ctx.stroke();});
 }
+$("useMkt").addEventListener("click",()=>{
+  $("infl").value=(MKT_BE.breakeven_5y*100).toFixed(1);render();});
 $("tgNom").addEventListener("click",()=>{payMode="nom";$("tgNom").classList.add("on");$("tgReal").classList.remove("on");if(last)drawPayChart(last.non,last.vtP,last.vtS,last.rc);});
 $("tgReal").addEventListener("click",()=>{payMode="real";$("tgReal").classList.add("on");$("tgNom").classList.remove("on");if(last)drawPayChart(last.non,last.vtP,last.vtS,last.rc);});
 function drawTable(non,vtP,vtS,userPay){
