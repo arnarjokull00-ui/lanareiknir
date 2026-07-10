@@ -28,7 +28,7 @@ Að greiða bara lágmarkið af verðtryggðu láni reyndist dýrasta leiðin í
 
 ## Hvað segir markaðurinn?
 
-Reiknivélin sækir einnig verðbólguálag, muninn á ávöxtunarkröfu óverðtryggðra og verðtryggðra ríkisbréfa, sem sýnir hvaða meðalverðbólgu skuldabréfamarkaðurinn verðleggur inn í næstu ár. Þann 6. júlí 2026 var 5 ára verðbólguálagið um 4,1% — vel undir 5,5% jafnvæginu hér að ofan, sem þýðir að miðað við verðbólguvæntingar markaðarins vinnur verðtryggða leiðin með aukagreiðslum. Útreikningurinn og gagnasöfnunin (RIKB/RIKS-kröfur frá Keldunni) er hér (../verdbolgualag)](https://github.com/arnarjokull00-ui/verdbolgualag).
+Reiknivélin sækir einnig verðbólguálag, muninn á ávöxtunarkröfu óverðtryggðra og verðtryggðra ríkisbréfa, sem sýnir hvaða meðalverðbólgu skuldabréfamarkaðurinn verðleggur inn í næstu ár. Þann 6. júlí 2026 var 5 ára verðbólguálagið um 4,1% — vel undir 5,5% jafnvæginu hér að ofan, sem þýðir að miðað við verðbólguvæntingar markaðarins vinnur verðtryggða leiðin með aukagreiðslum. Útreikningurinn og gagnasöfnunin (RIKB/RIKS-kröfur frá Keldunni) er hér (https://github.com/arnarjokull00-ui/verdbolgualag).
 
 ## Fyrir bakprófun
 
