@@ -1,6 +1,6 @@
 # Lánareiknir — verðtryggt eða óverðtryggt?
 
-Lifandi útgáfa: https://arnarjokull00-ui.github.io/lanareiknir/ · Python (bakprófun, gagnasöfnun) + JavaScript (reiknivél) · Gögn: Hagstofan, Keldan
+Gögn: Hagstofan, Keldan
 
 Reiknivél og greiningartól sem ber saman verðtryggð og óverðtryggð húsnæðislán — og svarar spurningunni:
 
