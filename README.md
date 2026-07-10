@@ -2,9 +2,9 @@
 
 Gögn: Hagstofan, Keldan
 
-Reiknivél og greiningartól sem ber saman verðtryggð og óverðtryggð húsnæðislán — og svarar spurningunni:
+Reiknivél og greiningartól sem ber saman verðtryggð og óverðtryggð húsnæðislán, og svarar spurningunni:
 
-**Hvað gerist ef þú tekur verðtryggt lán en greiðir samt jafn háa mánaðargreiðslu og óverðtryggða lánið hefði krafist?** Mismunurinn fer þá sem aukaafborgun inn á höfuðstólinn í hverjum mánuði.
+**Hvað gerist ef þú tekur verðtryggt lán en greiðir samt jafn háa mánaðargreiðslu og óverðtryggða lánið krefst?** Mismunurinn fer þá sem aukaafborgun inn á höfuðstólinn í hverjum mánuði.
 
 ## Prófaðu reiknivélina
 
@@ -12,9 +12,9 @@ Opnaðu https://arnarjokull00-ui.github.io/lanareiknir/ í vafra. Þú stillir h
 
 ## Helstu niðurstöður
 
-**Allt veltur á verðbólgunni.** Miðað við 4% raunvexti og 9% nafnvexti liggur jafnvægið við um það bil 5,5% meðalverðbólgu yfir lánstímann (háð vaxtamun leiðanna, sjá töflu). Undir því vinnur verðtryggða leiðin með aukagreiðslum en yfir 5,5% vinnur óverðtryggða lánið — til samanburðar er verðbólgumarkmið Seðlabankans 2,5%.
+**Allt veltur á verðbólgunni.** Miðað við 4% raunvexti og 9% nafnvexti liggur jafnvægið við um það bil 5,5% meðalverðbólgu yfir lánstímann (háð vaxtamun leiðanna, sjá töflu). Undir því vinnur verðtryggða leiðin með aukagreiðslum en yfir 5,5% vinnur óverðtryggða lánið. Til samanburðar er verðbólgumarkmið Seðlabankans 2,5%
 
-**Sagan 2015–2025:** keyrt á raunverulegri verðbólgu (Hagstofan) og stýrivaxtaferli tímabilsins — þar með talið verðbólgutímabilið 2022–2023 — er niðurstaðan háð vaxtaálagi óverðtryggða lánsins, sem ræðst af veðhlutfalli:
+**Sagan 2015–2025:** keyrt á raunverulegri verðbólgu (Hagstofan) og stýrivaxtaferli tímabilsins, þar með talið verðbólgutímabilið 2022–2023, er niðurstaðan háð vaxtaálagi óverðtryggða lánsins, sem ræðst af veðhlutfalli:
 
 | Vaxtaálag (veðhlutfall) | Hvor vann? | Munur |
 |---|---|---|
@@ -24,11 +24,11 @@ Opnaðu https://arnarjokull00-ui.github.io/lanareiknir/ í vafra. Þú stillir h
 
 Að greiða bara lágmarkið af verðtryggðu láni reyndist dýrasta leiðin í öllum sviðsmyndum.
 
-Í bakprófuninni eru nafnvextir nálgaðir sem stýrivextir + fast álag; raunveruleg kjör banka sveiflast einnig með fjármögnunarkostnaði þeirra og föstum vaxtatímabilum.
+Í bakprófuninni eru nafnvextir estimate-aðir sem stýrivextir + fast álag; raunveruleg kjör banka sveiflast einnig með fjármögnunarkostnaði þeirra og föstum vaxtatímabilum.
 
 ## Hvað segir markaðurinn?
 
-Reiknivélin sækir einnig verðbólguálag — muninn á ávöxtunarkröfu óverðtryggðra og verðtryggðra ríkisbréfa, sem sýnir hvaða meðalverðbólgu skuldabréfamarkaðurinn verðleggur inn í næstu ár. Þann 6. júlí 2026 var 5 ára verðbólguálagið um 4,1% — vel undir 5,5% jafnvæginu hér að ofan, sem þýðir að miðað við verðbólguvæntingar markaðarins vinnur verðtryggða leiðin með aukagreiðslum. Útreikningurinn og gagnasöfnunin (RIKB/RIKS-kröfur frá Keldunni) eru í systurverkefninu [verdbolgualag](../verdbolgualag).
+Reiknivélin sækir einnig verðbólguálag, muninn á ávöxtunarkröfu óverðtryggðra og verðtryggðra ríkisbréfa, sem sýnir hvaða meðalverðbólgu skuldabréfamarkaðurinn verðleggur inn í næstu ár. Þann 6. júlí 2026 var 5 ára verðbólguálagið um 4,1% — vel undir 5,5% jafnvæginu hér að ofan, sem þýðir að miðað við verðbólguvæntingar markaðarins vinnur verðtryggða leiðin með aukagreiðslum. Útreikningurinn og gagnasöfnunin (RIKB/RIKS-kröfur frá Keldunni) er hér [verdbolgualag](../verdbolgualag).
 
 ## Fyrir bakprófun
 
